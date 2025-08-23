@@ -1,15 +1,33 @@
 import { motion } from "framer-motion";
 
-type Particle = { x: string; y: string; size: number; delay: number; dur: number; opacity: number };
+type Particle = {
+  x: string;
+  y: string;
+  size: number;
+  delay: number;
+  dur: number;
+  blur: number;
+  tint: string; // rgba string
+  opacity: number;
+};
 
-const PARTICLES: Particle[] = Array.from({ length: 18 }).map(() => ({
-  x: `${Math.random() * 100}%`,
-  y: `${Math.random() * 100}%`,
-  size: 4 + Math.round(Math.random() * 8),
-  delay: Math.random() * 6,
-  dur: 12 + Math.random() * 12,
-  opacity: 0.15 + Math.random() * 0.25,
-}));
+const make = (count: number, min: number, max: number, blur: number, durBase: number, tint: string) =>
+  Array.from({ length: count }).map<Particle>(() => ({
+    x: `${Math.random() * 100}%`,
+    y: `${Math.random() * 100}%`,
+    size: min + Math.round(Math.random() * (max - min)),
+    delay: Math.random() * 6,
+    dur: durBase + Math.random() * durBase,
+    blur,
+    tint,
+    opacity: 0.12 + Math.random() * 0.25,
+  }));
+
+// 6) three layers: large/blurred (slow), medium, small/sharp (faster)
+const LAYER_A = make(10, 8, 14, 6, 18, "rgba(203, 255, 203, .35)"); // big, mint
+const LAYER_B = make(14, 5, 9, 3, 14, "rgba(200, 240, 255, .35)");   // mid, cool
+const LAYER_C = make(16, 3, 6, 1, 10, "rgba(255, 235, 180, .35)");   // small, warm
+const PARTICLES = [...LAYER_A, ...LAYER_B, ...LAYER_C];
 
 const FloatingParticles = () => {
   return (
@@ -23,10 +41,12 @@ const FloatingParticles = () => {
             width: p.size,
             height: p.size,
             opacity: p.opacity,
+            filter: `blur(${p.blur}px)`,
+            backgroundColor: p.tint,
           }}
-          className="absolute rounded-full bg-emerald-200"
-          initial={{ y: 0, x: 0, scale: 0.8 }}
-          animate={{ y: [-30, 30, -30], x: [10, -10, 10], scale: [0.8, 1, 0.8] }}
+          className="absolute rounded-full"
+          initial={{ y: 0, x: 0, scale: 0.9 }}
+          animate={{ y: [-40, 40, -40], x: [12, -12, 12], scale: [0.9, 1.05, 0.9] }}
           transition={{ duration: p.dur, delay: p.delay, repeat: Infinity, ease: "easeInOut" }}
         />
       ))}

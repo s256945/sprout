@@ -1,17 +1,16 @@
-import { motion, AnimatePresence } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import type { Mode } from "../hooks/usePomodoro";
 
 interface SproutPanelProps {
   mode: Mode;
   growthLevel: number;
+  completed?: boolean;
 }
 
-const SproutPanel = (props: SproutPanelProps) => {
-  const { mode, growthLevel } = props;
-
+const SproutPanel = ({ mode, growthLevel, completed = false }: SproutPanelProps) => {
   return (
     <section className="relative flex flex-col items-center justify-center">
-      {/* Short break waters sprout */}
+      {/* Nourishment ABOVE the sprout */}
       <AnimatePresence>
         {mode === "short" && (
           <motion.div
@@ -24,7 +23,6 @@ const SproutPanel = (props: SproutPanelProps) => {
             <DropletAnimation />
           </motion.div>
         )}
-        {/* Long break sun rays sprout */}
         {mode === "long" && (
           <motion.div
             key="sun"
@@ -38,12 +36,12 @@ const SproutPanel = (props: SproutPanelProps) => {
         )}
       </AnimatePresence>
 
-      {/* Sprout */}
+      {/* Sprout itself with idle sway and completion pulse */}
       <motion.div
-        animate={{ rotate: mode === "focus" ? [-1, 1, -1] : [0, 2, 0] }}
+        animate={{ rotate: mode === "focus" ? [-1.5, 1.5, -1.5] : [0, 2, 0] }}
         transition={{ repeat: Infinity, duration: 6 }}
       >
-        <SproutSVG level={growthLevel} />
+        <SproutSVG level={growthLevel} completed={completed} />
       </motion.div>
     </section>
   );
@@ -52,58 +50,82 @@ const SproutPanel = (props: SproutPanelProps) => {
 export default SproutPanel;
 
 /* ---------- Sprout SVG (levels 1..5) ---------- */
-export const SproutSVG = ({ level = 1 }: { level?: number }) => {
+export const SproutSVG = ({ level = 1, completed = false }: { level?: number; completed?: boolean }) => {
   return (
-    <svg
-      width={120}
-      height={120}
-      viewBox="0 0 120 120"
-      role="img"
-      aria-label="Growing sprout"
-    >
-      {/* stem */}
-      <path
-        d="M60 110 C62 75, 58 60, 60 40"
-        stroke="#059669"
-        strokeWidth={6}
-        fill="none"
-        strokeLinecap="round"
-      />
+    <svg width={120} height={120} viewBox="0 0 120 120" role="img" aria-label="Growing sprout">
+      <defs>
+        {/* leaf highlight */}
+        <linearGradient id="leafHi" x1="0" x2="1" y1="0" y2="1">
+          <stop offset="0%" stopColor="rgba(255,255,255,0.35)" />
+          <stop offset="100%" stopColor="rgba(255,255,255,0)" />
+        </linearGradient>
+        <radialGradient id="flowerGradient" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stopColor="#fde68a" />
+          <stop offset="100%" stopColor="#facc15" />
+        </radialGradient>
+      </defs>
+
+      {/* stem (slight curve) */}
+      <path d="M60 110 C62 80, 58 65, 60 40" stroke="#059669" strokeWidth={6} fill="none" strokeLinecap="round" />
+
       {/* base leaves */}
-      <path
-        d="M60 60 C40 40, 30 30, 25 25 C45 25, 60 35, 60 55"
-        fill="#34d399"
-      />
-      <path
-        d="M60 55 C60 35, 75 25, 95 25 C90 30, 80 40, 60 60"
-        fill="#10b981"
-      />
+      <path d="M60 60 C40 40, 30 30, 25 25 C45 25, 60 35, 60 55" fill="#34d399" />
+      <path d="M60 55 C60 35, 75 25, 95 25 C90 30, 80 40, 60 60" fill="#10b981" />
+
+      {/* highlights */}
+      <path d="M52 45 C45 40, 40 36, 37 34 C46 35, 52 38, 55 45" fill="url(#leafHi)" />
+      <path d="M70 45 C77 40, 82 36, 85 34 C77 35, 72 38, 69 45" fill="url(#leafHi)" />
 
       {/* extra growth by level */}
-      {level >= 2 && (
-        <path
-          d="M58 45 C50 35, 45 30, 42 28 C50 28, 58 32, 58 45"
-          fill="#86efac"
-        />
-      )}
-      {level >= 3 && (
-        <path
-          d="M62 45 C70 35, 75 30, 78 28 C70 28, 62 32, 62 45"
-          fill="#22c55e"
-        />
-      )}
+      {level >= 2 && <path d="M58 45 C50 35, 45 30, 42 28 C50 28, 58 32, 58 45" fill="#86efac" />}
+      {level >= 3 && <path d="M62 45 C70 35, 75 30, 78 28 C70 28, 62 32, 62 45" fill="#22c55e" />}
       {level >= 4 && <circle cx="60" cy="30" r="5" fill="#facc15" />}
+
+      {/* bloom */}
       {level >= 5 && (
+        <g>
+          {Array.from({ length: 6 }).map((_, i) => (
+            <motion.ellipse
+              key={i}
+              cx="60"
+              cy="25"
+              rx="9"
+              ry="16"
+              fill="#fbbf24"
+              stroke="#f59e0b"
+              strokeWidth="1.5"
+              transform={`rotate(${i * 60} 60 30)`}
+              initial={{ scale: 0.6, opacity: 0 }}
+              animate={{ scale: [0.6, 1.1, 1], opacity: 1 }}
+              transition={{ delay: i * 0.08, duration: 0.45 }}
+            />
+          ))}
+          <motion.circle
+            cx="60"
+            cy="30"
+            r="9"
+            fill="url(#flowerGradient)"
+            stroke="#b45309"
+            strokeWidth="2"
+            initial={{ scale: 0.6, opacity: 0 }}
+            animate={{ scale: [0.6, 1.15, 1], opacity: 1 }}
+            transition={{ duration: 0.5, ease: "easeOut" }}
+          />
+        </g>
+      )}
+
+      {/* 5) completion pulse */}
+      {completed && (
         <motion.circle
           cx="60"
-          cy="25"
-          r="10"
-          fill="#fde68a"
-          stroke="#f59e0b"
+          cy="60"
+          r="46"
+          fill="none"
+          stroke="rgba(250, 204, 21, .45)"
           strokeWidth="2"
-          initial={{ scale: 0.6, opacity: 0 }}
-          animate={{ scale: [0.6, 1.15, 1], opacity: 1 }}
-          transition={{ duration: 0.6, ease: "easeOut" }}
+          initial={{ scale: 0.9, opacity: 0 }}
+          animate={{ scale: [0.9, 1.1, 1], opacity: [0, 1, 0] }}
+          transition={{ duration: 0.8 }}
         />
       )}
     </svg>
@@ -119,12 +141,7 @@ const DropletAnimation = () => (
         className="w-3 h-5 bg-sky-400 rounded-full"
         initial={{ y: -40, opacity: 0 }}
         animate={{ y: 20, opacity: [0, 1, 0] }}
-        transition={{
-          delay: i * 0.25,
-          repeat: Infinity,
-          duration: 1.5,
-          ease: "easeInOut",
-        }}
+        transition={{ delay: i * 0.25, repeat: Infinity, duration: 1.5, ease: "easeInOut" }}
       />
     ))}
   </div>
@@ -146,9 +163,7 @@ const SunRaysAnimation = () => (
       <div
         key={i}
         className="absolute left-1/2 top-1/2 w-1 h-9 -translate-x-1/2 -translate-y-[calc(100%+6px)] origin-bottom rounded-full bg-amber-300/60"
-        style={{
-          transform: `rotate(${(i * 360) / 8}deg) translate(-50%, -100%)`,
-        }}
+        style={{ transform: `rotate(${(i * 360) / 8}deg) translate(-50%, -100%)` }}
       />
     ))}
   </motion.div>

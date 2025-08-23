@@ -23,7 +23,6 @@ export function usePomodoro() {
         if (s <= 1) {
           clearInterval(t);
           setRunning(false);
-          // auto-switch focus <-> break
           setMode((m) => (m === "focus" ? "short" : "focus"));
           return 0;
         }
@@ -40,7 +39,7 @@ export function usePomodoro() {
     setSecondsLeft(total);
   };
 
-  const progress = 1 - secondsLeft / total; // 0..1
+  const progress = 1 - secondsLeft / total;
 
   return { mode, setMode, running, start, pause, reset, secondsLeft, total, progress };
 }
