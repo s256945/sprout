@@ -6,13 +6,13 @@
 
 ## About
 
-**Sprout** makes productivity feel calm and playful. Instead of just watching a clock count down, each Pomodoro session you complete plants a sprout in your digital garden.  
+**Sprout** is a nature-inspired Pomodoro timer designed to make focus feel calmer and more engaging. As the timer runs, a small sprout on screen grows through different stages — from seedling to flower — giving you a simple, visual sense of progress.
 
-- 🎯 **Pomodoro focus sessions** with short and long breaks  
-- 🌱 **Sessions = sprouts** → every Pomodoro adds a new sprout to your garden  
-- 🌿 **Streaks = growth** → your central sprout grows from a seedling into a leafy plant, and eventually flowers  
-- 💧 **Breaks = watering** → playful animations during rest time show your sprouts being nourished  
-- 🪴 **Garden view** → track your history visually as rows of sprouts filling out a field  
+- 🎯 Pomodoro focus sessions with options for short and long breaks
+
+- 🌱 Visual growth → the sprout grows as you complete a session
+
+- 💧 Break animations → rain or sunlight nourish your sprout during breaks
 
 ---
 
