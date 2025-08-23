@@ -11,13 +11,15 @@ const pill = (active: boolean) =>
 interface HeaderProps {
   mode: Mode;
   setMode: (m: Mode) => void;
+  onAbout: () => void;
 }
 
-const Header = ({ mode, setMode }: HeaderProps) => {
+const Header = (props: HeaderProps) => {
+  const { mode, setMode, onAbout } = props;
+
   return (
     <header className="flex items-center justify-between gap-4 mb-6">
       <div className="flex items-center gap-3">
-        {/* 11) tiny sprout icon */}
         <svg width="28" height="28" viewBox="0 0 120 120" aria-hidden>
           <path
             d="M60 110 C62 75, 58 60, 60 40"
@@ -45,7 +47,7 @@ const Header = ({ mode, setMode }: HeaderProps) => {
         </div>
       </div>
 
-      <nav className="hidden sm:flex items-center gap-3">
+      <div className="hidden sm:flex items-center gap-3">
         <button
           className={pill(mode === "focus")}
           onClick={() => setMode("focus")}
@@ -53,7 +55,6 @@ const Header = ({ mode, setMode }: HeaderProps) => {
           Focus
         </button>
 
-        {/* 11) breathing dot between pills */}
         <motion.span
           className="w-1.5 h-1.5 rounded-full bg-white/40"
           animate={{ opacity: [0.4, 1, 0.4], y: [0, -2, 0] }}
@@ -86,7 +87,29 @@ const Header = ({ mode, setMode }: HeaderProps) => {
         >
           Long break
         </button>
-      </nav>
+
+        {/* Info icon button */}
+        <button
+          onClick={onAbout}
+          className="ml-3 flex items-center justify-center w-9 h-9 rounded-full bg-white/10 hover:bg-white/15 border border-white/10 transition"
+          aria-label="About Sprout"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="w-4 h-4 text-emerald-100"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            strokeWidth="2"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M13 16h-1v-4h-1m1-4h.01M12 2a10 10 0 100 20 10 10 0 000-20z"
+            />
+          </svg>
+        </button>
+      </div>
     </header>
   );
 };

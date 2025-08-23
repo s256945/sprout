@@ -1,17 +1,20 @@
+import { useState } from "react";
+import AboutModal from "./components/AboutModal";
 import FloatingParticles from "./components/FloatingParticles";
 import Header from "./components/Header";
 import SproutPanel from "./components/Sprout";
 import Timer from "./components/Timer";
 import { usePomodoro } from "./hooks/usePomodoro";
 
-const App = () => {
+export default function App() {
   const { mode, setMode, running, start, pause, reset, secondsLeft, progress } =
     usePomodoro();
+
+  const [aboutOpen, setAboutOpen] = useState(false);
 
   const cardClass =
     "relative rounded-3xl bg-white/5 backdrop-blur-md border border-white/10 shadow-[0_20px_80px_-30px_rgba(0,0,0,.6)]";
 
-  // sprout growth based on timer progress (1..5)
   const growthLevel = Math.min(1 + Math.floor(progress * 5), 5);
   const completed = progress >= 0.999;
 
@@ -21,7 +24,7 @@ const App = () => {
       <div className="pointer-events-none absolute inset-0 [background:radial-gradient(1200px_600px_at_30%_0%,rgba(16,185,129,.18),transparent_60%)]" />
       <div className="pointer-events-none absolute inset-0 [background:radial-gradient(900px_500px_at_80%_40%,rgba(245,158,11,.08),transparent_60%)]" />
 
-      {/* 1) Grain + vignette */}
+      {/* Grain + vignette */}
       <div className="pointer-events-none absolute inset-0 mix-blend-soft-light [background:radial-gradient(1200px_600px_at_50%_-10%,rgba(255,255,255,.06),transparent_60%)]" />
       <div
         className="pointer-events-none absolute inset-0 opacity-[.06]"
@@ -31,20 +34,22 @@ const App = () => {
         }}
       />
 
-      {/* 6) Floating spores/particles */}
+      {/* Floating particles */}
       <FloatingParticles />
 
       <div className="relative mx-auto max-w-4xl px-4 py-8 md:py-12">
-        <Header mode={mode} setMode={setMode} />
+        <Header
+          mode={mode}
+          setMode={setMode}
+          onAbout={() => setAboutOpen(true)}
+        />
 
-        {/* 4) Glass card with inner light */}
         <main
           className={`${cardClass} p-6 md:p-10 grid grid-cols-1 md:grid-cols-2 gap-10 items-center justify-items-center`}
         >
-          {/* inner light sheen */}
+          {/* sheen */}
           <div className="pointer-events-none absolute inset-x-6 top-6 h-24 rounded-2xl bg-gradient-to-b from-white/10 to-transparent blur-md" />
-
-          {/* 12) soft shadow under card */}
+          {/* soft shadow */}
           <div className="pointer-events-none absolute -inset-x-4 bottom-4 h-24 blur-2xl rounded-[40px] bg-emerald-900/40 opacity-50" />
 
           <Timer
@@ -56,7 +61,6 @@ const App = () => {
             reset={reset}
             progress={progress}
           />
-          {/* 9) hover lift on sprout panel */}
           <div className="w-full h-full flex items-center justify-center transition-transform hover:-translate-y-[2px]">
             <SproutPanel
               mode={mode}
@@ -66,8 +70,8 @@ const App = () => {
           </div>
         </main>
       </div>
+
+      <AboutModal open={aboutOpen} onClose={() => setAboutOpen(false)} />
     </div>
   );
-};
-
-export default App;
+}
