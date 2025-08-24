@@ -1,6 +1,6 @@
 # 🌱 Sprout
 
-*A nature-inspired Pomodoro timer where your focus grows into a garden.*
+*A nature-inspired Pomodoro timer where your focus grows a sproutling.*
 
 ---
 
