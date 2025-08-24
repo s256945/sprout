@@ -89,7 +89,7 @@ const AboutModal = (props: AboutModalProps) => {
                   Made with 🌱 by <strong>Amy Jordan</strong>
                 </p>
                 <a
-                  href="https://github.com/amyjordan/sprout"
+                  href="https://github.com/s256945/sprout"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="px-3 py-1.5 rounded-full text-xs font-semibold bg-white/10 border border-white/10 hover:bg-white/15 transition"

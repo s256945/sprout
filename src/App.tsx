@@ -1,16 +1,65 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import AboutModal from "./components/AboutModal";
 import FloatingParticles from "./components/FloatingParticles";
 import Header from "./components/Header";
 import SproutPanel from "./components/Sprout";
 import Timer from "./components/Timer";
+import { useChime } from "./hooks/useChime";
 import { usePomodoro } from "./hooks/usePomodoro";
+import { load, save } from "./lib/storage";
 
-export default function App() {
+const App = () => {
   const { mode, setMode, running, start, pause, reset, secondsLeft, progress } =
     usePomodoro();
-
   const [aboutOpen, setAboutOpen] = useState(false);
+
+  // Mute state (persisted)
+  const [muted, setMuted] = useState<boolean>(() =>
+    load("sprout:muted", false)
+  );
+  useEffect(() => save("sprout:muted", muted), [muted]);
+
+  const chime = useChime();
+
+  // Chime once session completes
+  const prevSeconds = useRef(secondsLeft);
+  useEffect(() => {
+    if (prevSeconds.current > 0 && secondsLeft === 0 && !muted) {
+      chime();
+    }
+    prevSeconds.current = secondsLeft;
+  }, [secondsLeft, muted, chime]);
+
+  // Keyboard shortcuts
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      // ignore if typing
+      const t = e.target as HTMLElement | null;
+      if (
+        t &&
+        (t.tagName === "INPUT" ||
+          t.tagName === "TEXTAREA" ||
+          t.isContentEditable)
+      )
+        return;
+
+      if (e.code === "Space") {
+        e.preventDefault();
+        if (running) {
+          pause();
+        } else {
+          start();
+        }
+      }
+      if (e.key.toLowerCase() === "r") reset();
+      if (e.key === "1") setMode("focus");
+      if (e.key === "2") setMode("short");
+      if (e.key === "3") setMode("long");
+      if (e.key.toLowerCase() === "m") setMuted((m) => !m);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [running, start, pause, reset, setMode]);
 
   const cardClass =
     "relative rounded-3xl bg-white/5 backdrop-blur-md border border-white/10 shadow-[0_20px_80px_-30px_rgba(0,0,0,.6)]";
@@ -20,7 +69,7 @@ export default function App() {
 
   return (
     <div className="relative min-h-screen bg-gradient-to-br from-emerald-900 via-emerald-950 to-emerald-900 text-emerald-50 overflow-hidden">
-      {/* Radial light layers */}
+      {/* Background lights */}
       <div className="pointer-events-none absolute inset-0 [background:radial-gradient(1200px_600px_at_30%_0%,rgba(16,185,129,.18),transparent_60%)]" />
       <div className="pointer-events-none absolute inset-0 [background:radial-gradient(900px_500px_at_80%_40%,rgba(245,158,11,.08),transparent_60%)]" />
 
@@ -34,7 +83,7 @@ export default function App() {
         }}
       />
 
-      {/* Floating particles */}
+      {/* Ambient particles */}
       <FloatingParticles />
 
       <div className="relative mx-auto max-w-4xl px-4 py-8 md:py-12">
@@ -42,6 +91,8 @@ export default function App() {
           mode={mode}
           setMode={setMode}
           onAbout={() => setAboutOpen(true)}
+          muted={muted}
+          onToggleMute={() => setMuted((m) => !m)}
         />
 
         <main
@@ -75,3 +126,5 @@ export default function App() {
     </div>
   );
 }
+
+export default App;

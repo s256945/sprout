@@ -1,9 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
+import { load, save } from "../lib/storage";
 
 export type Mode = "focus" | "short" | "long";
 
 export function usePomodoro() {
-  const [mode, setMode] = useState<Mode>("focus");
+  const [mode, setMode] = useState<Mode>(() => load<Mode>("sprout:mode", "focus"));
   const [running, setRunning] = useState(false);
 
   const total = useMemo(() => {
@@ -15,6 +16,7 @@ export function usePomodoro() {
   const [secondsLeft, setSecondsLeft] = useState(total);
 
   useEffect(() => setSecondsLeft(total), [total, mode]);
+  useEffect(() => save("sprout:mode", mode), [mode]);
 
   useEffect(() => {
     if (!running) return;
@@ -23,6 +25,7 @@ export function usePomodoro() {
         if (s <= 1) {
           clearInterval(t);
           setRunning(false);
+          // auto-switch focus <-> break
           setMode((m) => (m === "focus" ? "short" : "focus"));
           return 0;
         }
@@ -39,7 +42,7 @@ export function usePomodoro() {
     setSecondsLeft(total);
   };
 
-  const progress = 1 - secondsLeft / total;
+  const progress = 1 - secondsLeft / total; // 0..1
 
   return { mode, setMode, running, start, pause, reset, secondsLeft, total, progress };
 }
